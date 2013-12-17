@@ -1,0 +1,17 @@
+{
+  "name": "firesnaggle",
+  "version": "0.0.1",
+  "dependencies": {
+    "node-restify-swagger": "*",
+    "node-restify-validation": "*",
+    "restify": "*"
+  },
+  "engines": {
+    "node": ">=0.10.x",
+    "npm": ">=1.2.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cvan/firensnaggle.git"
+  }
+}
