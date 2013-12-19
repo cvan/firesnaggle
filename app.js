@@ -42,7 +42,7 @@ function screenshot(opts, cb) {
         FIRESNAGGLE_HEIGHT: opts.height,
         FIRESNAGGLE_DELAY: opts.delay,
         SLIMERJSLAUNCHER: firefoxBin,
-        PATH: '$PATH:$PWD/lib/packages/casperjs/bin:$PWD/lib/packages/slimerjs'
+        PATH: process.env.PATH + ':' + __dirname + '/lib/packages/casperjs/bin:' + __dirname + '/lib/packages/slimerjs'
     };
 
     var args = [
@@ -50,7 +50,7 @@ function screenshot(opts, cb) {
     ];
 
     var job = spawn(__dirname + '/lib/packages/casperjs/bin/casperjs', args,
-                    {cwd: __dirname, env: envVars});
+                    {env: envVars});
 
     job.stdout.on('data', function(data) {
         console.log('stdout: ' + data);
