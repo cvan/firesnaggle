@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+    <head>
+        <title>firesnaggle demo</title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <script>
+            // Load a cross-origin image (using CORS).
+            // This continually updates an `img` element's `src` until an image's
+            // data URI has changed.
+
+            function loadImage(uri, throbberUri) {
+                var canvas = document.createElement('canvas');
+                var ctx = canvas.getContext('2d');
+
+                var img = document.createElement('img');
+
+                var throbberDataURI;
+                var throbber = document.createElement('img');
+                throbber.crossOrigin = '';
+                throbber.src = throbberUri;
+                throbber.onload = function() {
+                    canvas.width = throbber.width;
+                    canvas.height = throbber.height;
+                    ctx.drawImage(throbber, 0, 0);
+                    throbberDataURI = canvas.toDataURL().substr(-64);
+                    _load(uri);
+                };
+
+                this._load = function(uri) {
+                    img.crossOrigin = '';
+
+                    var loaded;
+
+                    img.onload = function() {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+
+                        // If we're still showing the loading throbber,
+                        // then real image ain't yet loaded.
+                        loaded = canvas.toDataURL().substr(-64) !== throbberDataURI;
+                    };
+
+                    var refreshInterval = setInterval(function() {
+                        if (loaded === false) {
+                            console.log(refreshInterval, 'loading...');
+                            return src();
+                        } else if (loaded === true) {
+                            console.log(refreshInterval, 'loaded!');
+                            clearInterval(refreshInterval);
+                        }
+                    }, 2800);
+
+                    function src() {
+                        img.src = uri;
+                    }
+
+                    src();
+                };
+
+                return img;
+            }
+
+            document.body.appendChild(loadImage('http://localhost:5000/screenshot?width=320&height=480&delay=1&url=http://www.mysnuggiestore.com/',
+                'http://localhost:5000/static/loading.gif'));
+        </script>
+    </body>
+</html>
