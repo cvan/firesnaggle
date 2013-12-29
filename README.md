@@ -31,6 +31,7 @@ Snaggle up with firesnaggle™ today!
                 popd && \
                 export PATH=$PATH:$PWD/lib/packages/slimerjs
 
+
 ## Sample Usage
 
 ### Get a screenshot
@@ -45,6 +46,10 @@ Snaggle up with firesnaggle™ today!
 
     curl 'http://localhost:5000/screenshot?width=320&height=480&delay=5000&url=http://www.mysnuggiestore.com'
         -H 'Accept: image/gif,image/png'
+
+#### Render in a browser
+
+Fire up [http://localhost:5000/static/demo.html](http://localhost:5000/static/demo.html)
 
 ### Delete a screenshot
 
