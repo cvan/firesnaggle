@@ -9,9 +9,15 @@ var server = restify.createServer({
 
 server.use(restify.acceptParser(['image/gif', 'image/png']));
 server.use(restify.bodyParser());
+server.use(restify.CORS());
+server.use(restify.fullResponse());
 server.use(restify.gzipResponse());
 server.use(restify.queryParser());
 server.use(restifyValidation.validationPlugin({errorsAsArray: false}));
+
+server.get(/\/static\/?.*/, restify.serveStatic({
+    directory: './static'
+}));
 
 restifySwagger.configure(server);
 restifySwagger.loadRestifyRoutes();
