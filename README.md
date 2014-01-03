@@ -22,7 +22,7 @@ Snaggle up with firesnaggle™ today!
                 popd && \
                 export PATH=$PATH:$PWD/lib/packages/casperjs/bin
 
-    * [Capser](http://casperjs.org/)
+    * [Casper](http://casperjs.org/)
 
             echo 'Installing Casper' && \
                 pushd lib/packages && \
