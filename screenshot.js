@@ -1,3 +1,5 @@
+console.log('Running screenshot.js...');
+
 var fs = require('fs');
 var system = require('system');
 
@@ -11,6 +13,7 @@ var statusText = null;
 
 casper.start(system.env.FIRESNAGGLE_URL || 'http://www.mysnuggiestore.com',
              function(res) {
+    consle.log('casper.start');
     casper.viewport(width, height);
     this.wait(delay);
     status = res.status;
@@ -18,12 +21,13 @@ casper.start(system.env.FIRESNAGGLE_URL || 'http://www.mysnuggiestore.com',
 });
 
 casper.then(function() {
-    this.capture(system.env.FIRESNAGGLE_FILENAME_IMAGE || 'output.png', {
-        height: height,
-        left: 0,
-        top: 0,
-        width: width
-    });
+    consle.log('casper.then');
+    // this.capture(system.env.FIRESNAGGLE_FILENAME_IMAGE || 'output.png', {
+    //     height: height,
+    //     left: 0,
+    //     top: 0,
+    //     width: width
+    // });
 
     var html = this.getPageContent();
 
@@ -37,6 +41,11 @@ casper.then(function() {
     data.html = html;
     data.status = status;
     data.statusText = statusText;
+
+    console.log(html);
+    console.log(data);
+    console.log(system.env.FIRESNAGGLE_FILENAME_DOC || 'output.html');
+    console.log(system.env.FIRESNAGGLE_FILENAME_JSON || 'output.json');
 
     fs.write(system.env.FIRESNAGGLE_FILENAME_DOC || 'output.html', html);
 

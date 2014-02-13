@@ -8,16 +8,6 @@ var settings = require('./settings_local');
 var utils = require('./lib/utils');
 
 
-var firefoxBin = '$(which firefox)';
-switch (os.platform()) {
-    case 'darwin':
-        firefoxBin = '/Applications/Firefox.app/Contents/MacOS/firefox';
-        break;
-}
-if (process.env.FIREFOX_BIN) {
-    firefoxBin = FIREFOX_BIN;
-}
-
 function debug(req) {
     if (!settings.DEBUG) {
         return;
@@ -39,7 +29,7 @@ function screenshot(opts, cb) {
            FIRESNAGGLE_WIDTH=320 \
            FIRESNAGGLE_HEIGHT=480 \
            FIRESNAGGLE_DELAY=5000 \
-           SLIMERJSLAUNCHER=$(which firefox) \
+           SLIMERJS_EXECUTABLE=lib/packages/slimerjs/slimerjs \
            lib/packages/casperjs/bin/casperjs test \
                --engine=slimerjs screenshot.js
     */
@@ -52,15 +42,20 @@ function screenshot(opts, cb) {
         FIRESNAGGLE_WIDTH: opts.width,
         FIRESNAGGLE_HEIGHT: opts.height,
         FIRESNAGGLE_DELAY: opts.delay,
-        SLIMERJSLAUNCHER: firefoxBin,
+        SLIMERJS_EXECUTABLE: process.env.SLIMERJS_EXECUTABLE || __dirname + '/lib/packages/slimerjs/slimerjs',
         PATH: process.env.PATH + ':' + __dirname + '/lib/packages/casperjs/bin:' + __dirname + '/lib/packages/slimerjs'
     };
+
+    if (os.platform() === 'linux') {
+        envVars.SLIMERJS_EXECUTABLE = 'sudo xvfb-run ' + envVars.SLIMERJS_EXECUTABLE;
+    }
 
     var args = ['test'];
     if (settings.ENGINE) {
         args.push('--engine=' + settings.ENGINE);
     }
     args.push(__dirname + '/screenshot.js');
+    console.log(__dirname + '/lib/packages/casperjs/bin/casperjs', args);
 
     var job = spawn(__dirname + '/lib/packages/casperjs/bin/casperjs', args,
                     {env: envVars});

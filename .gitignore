@@ -7,12 +7,12 @@
 *.seed
 build
 lib-cov
-lib/packages
+lib/packages/*/
 logs
 node_modules
 output.*
 pids
 results
-screenshots
+static/screenshots
 settings_local.js
 tmp

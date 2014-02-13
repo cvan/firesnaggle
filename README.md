@@ -4,33 +4,16 @@ What's that? You have a website URL. And you need, what, a screenshot (and
 the HTML) of said website at mobile width in Firefox? Well, gee golly, no
 look no further! Snaggle up with firesnaggle™ today!
 
+This tool is made possible by the fantastic [slimerjs](http://slimerjs.org/)
+and [casperjs](http://casperjs.org/) libraries.
+
 
 ## Installation
 
 * `npm install`
 * `cp settings_local.js.dist settings_local.js`
 * `nodemon app.js`
-* Install the following dependencies:
-    * [Slimer](http://slimerjs.org/)
-
-            echo 'Installing Slimer' &&
-                pushd lib/packages && \
-                curl http://download.slimerjs.org/v0.8/0.8.5/slimerjs-0.8.5.zip -o slimerjs.zip && \
-                unzip slimerjs.zip -d slimer-temp && \
-                mv slimer-temp/slimer* slimerjs/ && \
-                rm -rf slimer-temp slimerjs.zip && \
-                popd && \
-                export PATH=$PATH:$PWD/lib/packages/casperjs/bin
-
-    * [Casper](http://casperjs.org/)
-
-            echo 'Installing Casper' && \
-                pushd lib/packages && \
-                git clone --single-branch -b '1.1-beta3' \
-                    git://github.com/n1k0/casperjs.git && \
-                popd && \
-                export PATH=$PATH:$PWD/lib/packages/slimerjs
-
+* `./install-packages.sh`
 
 ## Sample Usage
 
