@@ -1,8 +1,8 @@
 # firesnaggle
 
-What's that? You have a website URL. And you need, what, a screenshot of said
-website at mobile width in Firefox? Well, gee golly, no look no further!
-Snaggle up with firesnaggle™ today!
+What's that? You have a website URL. And you need, what, a screenshot (and
+the HTML) of said website at mobile width in Firefox? Well, gee golly, no
+look no further! Snaggle up with firesnaggle™ today!
 
 
 ## Installation
@@ -57,3 +57,27 @@ Fire up [http://localhost:5000/static/demo.html](http://localhost:5000/static/de
 
     curl -iX DELETE 'http://localhost:5000/screenshot?url=http://www.mysnuggiestore.com'
         -H 'Accept: image/gif,image/png'
+
+### Get the HTML
+
+To get the resulting HTML after the JS has been loaded:
+
+#### `GET`
+
+    curl 'http://localhost:5000/html?delay=5000&url=http://www.mysnuggiestore.com'
+
+#### `DELETE`
+
+    curl X DELETE 'http://localhost:5000/html?url=http://www.mysnuggiestore.com'
+
+### Get the HTML, page title, and final URL
+
+To get the resulting HTML, page title, and final URL after the JS has been loaded:
+
+#### `GET`
+
+    curl 'http://localhost:5000/json?delay=5000&url=http://www.mysnuggiestore.com'
+
+#### `DELETE`
+
+    curl X DELETE 'http://localhost:5000/json?url=http://www.mysnuggiestore.com'
