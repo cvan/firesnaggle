@@ -1,13 +1,20 @@
 var fs = require('fs');
 var system = require('system');
 
+
 var delay = system.env.FIRESNAGGLE_DELAY || 5000;
 var height = parseInt(system.env.FIRESNAGGLE_HEIGHT, 10) || 480;
 var width = parseInt(system.env.FIRESNAGGLE_WIDTH, 10) || 320;
 
-casper.start(system.env.FIRESNAGGLE_URL || 'http://www.mysnuggiestore.com', function() {
+var status = null;
+var statusText = null;
+
+casper.start(system.env.FIRESNAGGLE_URL || 'http://www.mysnuggiestore.com',
+             function(res) {
     casper.viewport(width, height);
     this.wait(delay);
+    status = res.status;
+    statusText = res.statusText;
 });
 
 casper.then(function() {
@@ -20,19 +27,16 @@ casper.then(function() {
 
     var html = this.getPageContent();
 
-    var location = this.evaluate(function () {
-        return window.location.href;
+    var data = this.evaluate(function () {
+        return {
+            location: window.location.href,
+            title: document.title
+        };
     });
 
-    var title = this.evaluate(function () {
-        return document.title;
-    });
-
-    var data = {
-        html: html,
-        location: location,
-        title: title
-    };
+    data.html = html;
+    data.status = status;
+    data.statusText = statusText;
 
     fs.write(system.env.FIRESNAGGLE_FILENAME_DOC || 'output.html', html);
 
