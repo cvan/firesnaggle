@@ -304,6 +304,6 @@ server.get(createJSONEndpoint, createJSONView);
 server.post(createJSONEndpoint, createJSONView);
 server.del(createJSONEndpoint, deleteScreenshotView);
 
-server.listen(process.env.PORT || 5000, function() {
+server.listen(process.env.PORT || 7000, function() {
     console.log('%s listening at %s', server.name, server.url);
 });
