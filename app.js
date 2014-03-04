@@ -18,7 +18,7 @@ function debug(req) {
 
 
 function screenshot(opts, cb) {
-    console.log('Taking screenshot...')
+    console.log('Taking screenshot...');
     var output = '';
     var error = '';
 
@@ -29,9 +29,7 @@ function screenshot(opts, cb) {
            FIRESNAGGLE_WIDTH=320 \
            FIRESNAGGLE_HEIGHT=480 \
            FIRESNAGGLE_DELAY=5000 \
-           SLIMERJS_EXECUTABLE=lib/packages/slimerjs/slimerjs \
-           lib/packages/casperjs/bin/casperjs test \
-               --engine=slimerjs screenshot.js
+           lib/packages/slimerjs/slimerjs screenshot.js
     */
 
     var envVars = {
@@ -42,23 +40,35 @@ function screenshot(opts, cb) {
         FIRESNAGGLE_WIDTH: opts.width,
         FIRESNAGGLE_HEIGHT: opts.height,
         FIRESNAGGLE_DELAY: opts.delay,
-        SLIMERJS_EXECUTABLE: process.env.SLIMERJS_EXECUTABLE || __dirname + '/lib/packages/slimerjs/slimerjs',
-        PATH: process.env.PATH + ':' + __dirname + '/lib/packages/casperjs/bin:' + __dirname + '/lib/packages/slimerjs'
+        PATH: process.env.PATH + ':' + __dirname + '/lib/packages/slimerjs'
     };
 
+    var SLIMERJS_EXECUTABLE = process.env.SLIMERJS_EXECUTABLE ||
+                              __dirname + '/lib/packages/slimerjs/slimerjs';
+
+    var args = [__dirname + '/screenshot.js'];
+    var job;
+
     if (os.platform() === 'linux') {
-        envVars.SLIMERJS_EXECUTABLE = 'sudo xvfb-run ' + envVars.SLIMERJS_EXECUTABLE;
-    }
-
-    var args = ['test'];
-    if (settings.ENGINE) {
-        args.push('--engine=' + settings.ENGINE);
-    }
-    args.push(__dirname + '/screenshot.js');
-    console.log(__dirname + '/lib/packages/casperjs/bin/casperjs', args);
-
-    var job = spawn(__dirname + '/lib/packages/casperjs/bin/casperjs', args,
+        // Workaround for bug where slimerjs does not inherit environment
+        // variables when run headlessly.
+        args = args.concat([
+            'delay=' + envVars.FIRESNAGGLE_DELAY,
+            'fn_doc=' + envVars.FIRESNAGGLE_FILENAME_DOC,
+            'fn_image=' + envVars.FIRESNAGGLE_FILENAME_IMAGE,
+            'fn_json=' + envVars.FIRESNAGGLE_FILENAME_JSON,
+            'height=' + envVars.FIRESNAGGLE_HEIGHT,
+            'url=' + envVars.FIRESNAGGLE_URL,
+            'width=' + envVars.FIRESNAGGLE_WIDTH
+        ]);
+        console.log('sudo', 'xvfb-run', SLIMERJS_EXECUTABLE, args.join(' '), JSON.stringify(envVars));
+        job = spawn('sudo',
+                    ['xvfb-run', SLIMERJS_EXECUTABLE].concat(args),
                     {env: envVars});
+    } else {
+        console.log(SLIMERJS_EXECUTABLE, JSON.stringify(envVars));
+        job = spawn(SLIMERJS_EXECUTABLE, args, {env: envVars});
+    }
 
     job.stdout.on('data', function(data) {
         console.log('stdout: ' + data);
@@ -75,7 +85,7 @@ function screenshot(opts, cb) {
             if (error) {
                 error = 'stderr: ' + error;
             } else {
-                error = 'casperjs ' + args[0] + ' exited: ' + code;
+                error = 'slimerjs ' + args[0] + ' exited: ' + code;
             }
         }
         cb(error, output);
@@ -152,7 +162,7 @@ function createScreenshotView(req, res, format) {
 
     var baseDir = path.dirname(fnTemp);
     if (!fs.existsSync(baseDir)) {
-        console.error('Directory "' + baseDir + '" does not exist');
+        console.error('Directory "' + baseDir + '" does not exists');
         utils.mkdirRecursive(baseDir);
     }
 
@@ -176,7 +186,7 @@ function createScreenshotView(req, res, format) {
         if (err) {
             console.error('Error creating ' + fn + ':\n', err);
         } else {
-            console.log('Successfully created ' + fn +':\n', output);
+            console.log('Successfully created ' + fn +':\n', data);
         }
     });
 }
@@ -195,7 +205,7 @@ function deleteScreenshotView(req, res) {
     [fnDoc, fnImg, fnJSON, fnTemp].forEach(function(fn) {
         fs.exists(fn, function(exists) {
             if (exists) {
-                fs.unlink(fn, function(err, data) {
+                fs.unlink(fn, function(err) {
                     if (err) {
                         return console.error('Error reading ' + fn + ':\n',
                                              err);

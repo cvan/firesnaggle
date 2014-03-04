@@ -10,7 +10,12 @@ mem: 128
 
 hooks:
     post-staging:
-        - rm -rfv lib/packages; ./install-packages.sh
+        - rm -rfv lib/packages
+        - ./install-packages.sh
+    pre-running:
+        - sudo apt-get --yes --force-yes update
+        - sudo apt-get --yes --force-yes install xvfb
+        - ./test-packages.sh
 
 processes:
     web: PROD=1 npm start

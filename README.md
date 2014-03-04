@@ -5,7 +5,7 @@ the HTML) of said website at mobile width in Firefox? Well, gee golly, no
 look no further! Snaggle up with firesnaggle™ today!
 
 This tool is made possible by the fantastic [slimerjs](http://slimerjs.org/)
-and [casperjs](http://casperjs.org/) libraries.
+library.
 
 
 ## Installation
@@ -14,6 +14,14 @@ and [casperjs](http://casperjs.org/) libraries.
 * `cp settings_local.js.dist settings_local.js`
 * `nodemon app.js`
 * `./install-packages.sh`
+
+
+## Deployment
+
+To deploy to stackato:
+
+    stackato push --no-prompt
+
 
 ## Sample Usage
 
@@ -51,7 +59,7 @@ To get the resulting HTML after the JS has been loaded:
 
 #### `DELETE`
 
-    curl X DELETE 'http://localhost:5000/html?url=http://www.mysnuggiestore.com'
+    curl -X DELETE 'http://localhost:5000/html?url=http://www.mysnuggiestore.com'
 
 ### Get the HTML, page title, and final URL
 
@@ -63,4 +71,4 @@ To get the resulting HTML, page title, and final URL after the JS has been loade
 
 #### `DELETE`
 
-    curl X DELETE 'http://localhost:5000/json?url=http://www.mysnuggiestore.com'
+    curl -X DELETE 'http://localhost:5000/json?url=http://www.mysnuggiestore.com'

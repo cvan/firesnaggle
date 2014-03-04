@@ -1,56 +1,91 @@
-console.log('Running screenshot.js...');
+/*
+
+    Sample usage:
+
+        lib/packages/slimerjs/slimerjs screenshot.js
+
+    Headlessly:
+
+        sudo xvfb-run lib/packages/slimerjs/slimerjs screenshot.js
+
+    On stackato:
+
+        stackato run sudo xvfb-run lib/packages/slimerjs/slimerjs screenshot.js
+
+*/
+
+console.log('Capturing screenshot ...');
 
 var fs = require('fs');
 var system = require('system');
+var webpage = require('webpage');
 
+console.log(JSON.stringify(system.env, null, 2));
 
-var delay = system.env.FIRESNAGGLE_DELAY || 5000;
-var height = parseInt(system.env.FIRESNAGGLE_HEIGHT, 10) || 480;
-var width = parseInt(system.env.FIRESNAGGLE_WIDTH, 10) || 320;
+var CONFIG = {
+    delay: system.env.FIRESNAGGLE_DELAY || 5000,
+    fn_doc: system.env.FIRESNAGGLE_FILENAME_DOC || 'output.html',
+    fn_image: system.env.FIRESNAGGLE_FILENAME_IMAGE || 'output.png',
+    fn_json: system.env.FIRESNAGGLE_FILENAME_JSON || 'output.json',
+    height: parseInt(system.env.FIRESNAGGLE_HEIGHT, 10) || 480,
+    url: system.env.FIRESNAGGLE_URL || 'http://www.mysnuggiestore.com',
+    width: parseInt(system.env.FIRESNAGGLE_WIDTH, 10) || 320
+};
 
-var status = null;
-var statusText = null;
-
-casper.start(system.env.FIRESNAGGLE_URL || 'http://www.mysnuggiestore.com',
-             function(res) {
-    consle.log('casper.start');
-    casper.viewport(width, height);
-    this.wait(delay);
-    status = res.status;
-    statusText = res.statusText;
+// Workaround for bug where slimerjs does not inherit environment
+// variables when run headlessly.
+system.args.slice(1).forEach(function (key) {
+    var chunks = key.split('=');
+    CONFIG[chunks[0]] = chunks.slice(1).join('=');
 });
+console.log('config:' + JSON.stringify(CONFIG, null, 2));
 
-casper.then(function() {
-    consle.log('casper.then');
-    // this.capture(system.env.FIRESNAGGLE_FILENAME_IMAGE || 'output.png', {
-    //     height: height,
-    //     left: 0,
-    //     top: 0,
-    //     width: width
-    // });
+var urlStatuses = {};
+var page = webpage.create();
 
-    var html = this.getPageContent();
+page.viewportSize = {width: CONFIG.width, height: CONFIG.height};
 
-    var data = this.evaluate(function () {
-        return {
-            location: window.location.href,
-            title: document.title
+page.onResourceReceived = function (response) {
+    // We don't know what the final URL is yet, but we will later,
+    // so we'll just look up the status for that URL later. (This is a
+    // workaround for https://github.com/ariya/phantomjs/issues/10185)
+    urlStatuses[response.url] = {
+        status: response.status,
+        statusText: response.statusText
+    };
+};
+
+page.open(CONFIG.url, function (status) {
+    if (status === 'fail') {
+        return phantom.exit();
+    }
+    window.setTimeout(function () {
+        page.clipRect = {
+            height: CONFIG.height,
+            left: 0,
+            top: 0,
+            width: CONFIG.width
         };
-    });
 
-    data.html = html;
-    data.status = status;
-    data.statusText = statusText;
+        page.render(CONFIG.fn_image);
 
-    console.log(html);
-    console.log(data);
-    console.log(system.env.FIRESNAGGLE_FILENAME_DOC || 'output.html');
-    console.log(system.env.FIRESNAGGLE_FILENAME_JSON || 'output.json');
+        var data = page.evaluate(function () {
+            return {
+                location: window.location.href,
+                title: document.title
+            };
+        });
 
-    fs.write(system.env.FIRESNAGGLE_FILENAME_DOC || 'output.html', html);
+        data.html = page.content;
 
-    fs.write(system.env.FIRESNAGGLE_FILENAME_JSON || 'output.json',
-             JSON.stringify(data));
+        var status = urlStatuses[data.location];
+        data.status = status.status;
+        data.statusText = status.statusText;
+        console.log(JSON.stringify(data, null, 2));
+
+        fs.write(CONFIG.fn_doc, data.html);
+        fs.write(CONFIG.fn_json, JSON.stringify(data));
+
+        phantom.exit();
+    }, CONFIG.delay);
 });
-
-casper.run();
