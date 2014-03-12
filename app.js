@@ -1,7 +1,10 @@
+var crypto = require('crypto');
 var fs = require('fs');
 var os = require('os');
 var path = require('path');
 var spawn = require('child_process').spawn;
+
+var request = require('request');
 
 var server = require('./server');
 var settings = require('./settings_local');
@@ -14,6 +17,13 @@ function debug(req) {
     }
     console.log('\n' + new Date(), '[' + req.method + ']', req.url);
     console.log(req.params);
+}
+
+
+function getUrlboxURL(args) {
+    var qs = utils.serialize(args);
+    var token = crypto.createHmac('sha1', settings.URLBOX_API_SECRET).update(qs).digest('hex');
+    return 'https://api.urlbox.io/v1/' + settings.URLBOX_API_KEY + '/' + token + '/png?' + qs;
 }
 
 
@@ -31,6 +41,17 @@ function screenshot(opts, cb) {
            FIRESNAGGLE_DELAY=5000 \
            lib/packages/slimerjs/slimerjs screenshot.js
     */
+
+    var urlboxOpts = {
+        height: opts.height,
+        width: opts.width,
+        url: opts.url
+    };
+    // Pipe urlbox image to a file.
+    request(getUrlboxURL(urlboxOpts)).pipe(fs.createWriteStream(opts.filename_image));
+
+    // Temporarily disable slimerjs screenshots.
+    return;
 
     var envVars = {
         DISPLAY: ':0',

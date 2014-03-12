@@ -1,10 +1,11 @@
 {
   "name": "firesnaggle",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "dependencies": {
-    "node-restify-swagger": "*",
-    "node-restify-validation": "*",
-    "restify": "*"
+    "node-restify-swagger": "latest",
+    "node-restify-validation": "latest",
+    "request": "latest",
+    "restify": "latest"
   },
   "engines": {
     "node": ">=0.10.x",
