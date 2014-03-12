@@ -21,6 +21,7 @@ function debug(req) {
 
 
 function getUrlboxURL(args) {
+    args.user_agent = 'android4.2';
     var qs = utils.serialize(args);
     var token = crypto.createHmac('sha1', settings.URLBOX_API_SECRET).update(qs).digest('hex');
     return 'https://api.urlbox.io/v1/' + settings.URLBOX_API_KEY + '/' + token + '/png?' + qs;
