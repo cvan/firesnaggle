@@ -20,7 +20,6 @@ var fs = require('fs');
 var system = require('system');
 var webpage = require('webpage');
 
-console.log(JSON.stringify(system.env, null, 2));
 
 var CONFIG = {
     delay: system.env.FIRESNAGGLE_DELAY || 5000,
@@ -38,6 +37,8 @@ system.args.slice(1).forEach(function (key) {
     var chunks = key.split('=');
     CONFIG[chunks[0]] = chunks.slice(1).join('=');
 });
+CONFIG.height = parseInt(CONFIG.height, 10);
+CONFIG.width = parseInt(CONFIG.width, 10);
 console.log('config:' + JSON.stringify(CONFIG, null, 2));
 
 var urlStatuses = {};

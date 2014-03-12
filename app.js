@@ -33,20 +33,20 @@ function screenshot(opts, cb) {
     */
 
     var envVars = {
+        DISPLAY: ':0',
         FIRESNAGGLE_FILENAME_DOC: opts.filename_doc,
         FIRESNAGGLE_FILENAME_IMAGE: opts.filename_image,
         FIRESNAGGLE_FILENAME_JSON: opts.filename_json,
         FIRESNAGGLE_URL: opts.url,
         FIRESNAGGLE_WIDTH: opts.width,
         FIRESNAGGLE_HEIGHT: opts.height,
-        FIRESNAGGLE_DELAY: opts.delay,
-        PATH: process.env.PATH + ':' + __dirname + '/lib/packages/slimerjs'
+        FIRESNAGGLE_DELAY: opts.delay
     };
 
     var SLIMERJS_EXECUTABLE = process.env.SLIMERJS_EXECUTABLE ||
                               __dirname + '/lib/packages/slimerjs/slimerjs';
 
-    var args = [__dirname + '/screenshot.js'];
+    var args = ['--debug=true', __dirname + '/screenshot.js'];
     var job;
 
     if (os.platform() === 'linux') {
@@ -61,10 +61,7 @@ function screenshot(opts, cb) {
             'url=' + envVars.FIRESNAGGLE_URL,
             'width=' + envVars.FIRESNAGGLE_WIDTH
         ]);
-        console.log('sudo', 'xvfb-run', SLIMERJS_EXECUTABLE, args.join(' '), JSON.stringify(envVars));
-        job = spawn('sudo',
-                    ['xvfb-run', SLIMERJS_EXECUTABLE].concat(args),
-                    {env: envVars});
+        job = spawn('sudo', [SLIMERJS_EXECUTABLE].concat(args), {env: envVars});
     } else {
         console.log(SLIMERJS_EXECUTABLE, JSON.stringify(envVars));
         job = spawn(SLIMERJS_EXECUTABLE, args, {env: envVars});
